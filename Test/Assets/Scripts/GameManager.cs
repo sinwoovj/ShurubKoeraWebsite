@@ -18,16 +18,30 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     public Material newskybox;
 
-    void Start()
+    public bool isFScreen = false;
+    private FirstPersonCam firstPersonCam; // 마우스 이동으로 카메라 회전
+    void Awake()
     {
-        MouseSetting.mouseSetting();
+        firstPersonCam = GetComponent<FirstPersonCam>();
     }
+
     void Update()
     {
+        UpdateRotate();
 #if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.Escape))
             UnityEditor.EditorApplication.isPlaying = false;
 #endif
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            isFScreen = !isFScreen;
+        }
+        if (isFScreen)
+        {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+            Screen.fullScreen = true;
+        }
         if (ItemCount == -1)
         {
             RenderSettings.skybox = newskybox;
@@ -45,9 +59,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public static void mouseSetting()
+    void UpdateRotate()
     {
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
+        float mouseX = Input.GetAxis("Mouse X");
+        float mouseY = Input.GetAxis("Mouse Y");
+        firstPersonCam.CalculateRotation(mouseX, mouseY);
     }
 }
